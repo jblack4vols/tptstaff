@@ -1,0 +1,219 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tristar Intranet</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <style>
+    /* Global Styles */
+    :root {
+      --primary-color: #ff8200;
+      --secondary-color: #ffead5;
+      --text-color: #000000;
+      --background-color: #ffffff;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background-color);
+      color: var(--text-color);
+    }
+
+    /* Login and Sign-Up Pages */
+    #login-page, #signup-page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: var(--primary-color);
+    }
+
+    #login-box {
+      background-color: var(--background-color);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    #login-box h2 {
+      color: var(--primary-color);
+    }
+
+    #login-box input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid var(--primary-color);
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    #login-box button {
+      background-color: var(--primary-color);
+      color: var(--background-color);
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    #login-box button:hover {
+      background-color: var(--text-color);
+    }
+
+    /* Main Intranet */
+    #intranet {
+      display: none;
+      padding: 20px;
+    }
+
+    header {
+      background-color: var(--primary-color);
+      padding: 10px 0;
+    }
+
+    .navbar {
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 0;
+      margin: 0;
+    }
+
+    .navbar li {
+      margin: 10px 15px;
+    }
+
+    .navbar a {
+      color: var(--background-color);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .navbar a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      background-color: var(--secondary-color);
+      text-align: center;
+      padding: 10px 0;
+      color: var(--text-color);
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+      }
+
+      .navbar li {
+        margin: 10px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Page -->
+  <div id="login-page">
+    <div id="login-box">
+      <h2>Login</h2>
+      <input type="email" id="login-email" placeholder="Email" required>
+      <input type="password" id="login-password" placeholder="Password" required>
+      <button onclick="handleLogin()">Login</button>
+      <p>Don't have an account? <a href="#" onclick="showSignUp()">Sign Up</a></p>
+    </div>
+  </div>
+
+  <!-- Sign-Up Page -->
+  <div id="signup-page" style="display: none;">
+    <div id="login-box">
+      <h2>Sign Up</h2>
+      <input type="email" id="signup-email" placeholder="Email" required>
+      <input type="password" id="signup-password" placeholder="Password" required>
+      <button onclick="handleSignUp()">Sign Up</button>
+      <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+    </div>
+  </div>
+
+  <!-- Main Intranet -->
+  <div id="intranet">
+    <header>
+      <nav>
+        <ul class="navbar">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#frontdesk">Front Desk</a></li>
+          <li><a href="#billing">Billing</a></li>
+          <li><a href="#therapists">Therapists</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <section id="home">
+        <h1>Welcome to the Tristar Intranet</h1>
+        <p><a href="https://tristarpt.slack.com/">Join our Slack Workspace</a></p>
+      </section>
+    </main>
+    <footer>
+      <p>&copy; 2024 Tristar Physical Therapy. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script>
+    // Supabase initialization
+    const supabaseUrl = 'YOUR_SUPABASE_URL';
+    const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Show Login Page
+    function showLogin() {
+      document.getElementById('login-page').style.display = 'flex';
+      document.getElementById('signup-page').style.display = 'none';
+    }
+
+    // Show Sign-Up Page
+    function showSignUp() {
+      document.getElementById('signup-page').style.display = 'flex';
+      document.getElementById('login-page').style.display = 'none';
+    }
+
+    // Handle Login
+    async function handleLogin() {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        alert('Login failed: ' + error.message);
+      } else {
+        alert('Login successful!');
+        document.getElementById('login-page').style.display = 'none';
+        document.getElementById('intranet').style.display = 'block';
+      }
+    }
+
+    // Handle Sign-Up
+    async function handleSignUp() {
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+
+      const { data, error } = await supabase.auth.signUp({ email, password });
+
+      if (error) {
+        alert('Sign-up failed: ' + error.message);
+      } else {
+        alert('Sign-up successful! You can now log in.');
+        showLogin();
+      }
+    }
+  </script>
+</body>
+</html>
